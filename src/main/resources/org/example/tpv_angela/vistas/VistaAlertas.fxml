@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="rootAlerta" alignment="CENTER" spacing="20" stylesheets="@../estilo/style.css"
+      styleClass="alerta-contenedor"  xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.tpv_angela.ControladorAlertas">
+    <children>
+        <Label fx:id="lblTitulo" text="ERROR" styleClass="alerta-titulo" />
+        <Label fx:id="lblMensaje" text="Aquí va el error" styleClass="alerta-mensaje"
+               wrapText="true" textAlignment="CENTER" />
+        <Button fx:id="btnEntendido" text="ENTENDIDO" onAction="#cerrarAlerta" styleClass="alerta-boton" />
+    </children>
+</VBox>

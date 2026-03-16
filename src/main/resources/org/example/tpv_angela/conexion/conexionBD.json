@@ -1,0 +1,6 @@
+{
+  "_comentario": "Configuración de conexión a la base de datos",
+  "host": "localhost",
+  "puerto": 27017,
+  "database": "HostelHub"
+}

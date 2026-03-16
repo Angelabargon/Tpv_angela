@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Line?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+
+<StackPane fx:id="rootPane" prefHeight="1080.0" prefWidth="1920.0"
+           styleClass="root-container" stylesheets="@../estilo/style.css"
+           xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.example.tpv_angela.controladores.ControladorLogin">
+
+    <children>
+
+        <ImageView pickOnBounds="true" preserveRatio="false"
+                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" opacity="0.3">
+            <image>
+                <Image url="@../imagenes/fondo.png" />
+            </image>
+        </ImageView>
+
+        <VBox alignment="CENTER" spacing="25.0" styleClass="login-card"
+              StackPane.alignment="CENTER" maxHeight="550.0" maxWidth="450.0">
+            <padding>
+                <Insets top="50" right="50" bottom="50" left="50"/>
+            </padding>
+
+            <children>
+                <Label text="LOGIN" styleClass="login-title" />
+
+                <Region prefHeight="30.0" />
+
+                <VBox spacing="15.0">
+                    <TextField fx:id="txtUsername" promptText="Username" styleClass="input-field" />
+                    <PasswordField fx:id="txtPassword" promptText="Password" styleClass="input-field" />
+                </VBox>
+
+                <Button fx:id="btnLogin" text="Login" onAction="#entrarComoAdmin"
+                        styleClass="login-button" maxWidth="Infinity" />
+
+                <Button fx:id="btnVolver" text="Volver" onAction="#salir"
+                        styleClass="return-button" maxWidth="Infinity" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>
