@@ -1,4 +1,4 @@
-package org.example.tpv_angela.controladores;
+package org.example.tpv_angela.controladores.admin;
 
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
@@ -59,7 +59,7 @@ public class ControladorLogin
         if (user.isEmpty() || pass.isEmpty())
         {
             shakeEffect(btnLogin);
-            mostrarAlerta("Campos incompletos", "Por favor, introduce usuario y contraseña.");
+            mostrarAlerta("Campos vacíos", "Por favor, introduce usuario y contraseña.");
         }
         else
         {
@@ -68,7 +68,7 @@ public class ControladorLogin
             if (usuarioEncontrado != null)
             {
                 //Login correcto
-                Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/VistaMenuInicialAdmin.fxml", "Menu Inicial");
+                Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/admin/VistaMenuInicialAdmin.fxml", "Menu Inicial");
             }
             else
             {

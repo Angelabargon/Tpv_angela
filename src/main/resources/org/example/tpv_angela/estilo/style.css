@@ -236,3 +236,42 @@
 {
     -fx-background-color: #333333;
 }
+
+
+/* --- CONTENEDOR GENERAL (MENU LATERAL) --- */
+.boton-menu {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-padding: 10 5 10 5;
+    -fx-alignment: CENTER;
+    -fx-background-radius: 12;
+}
+
+.boton-menu:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.boton-activo {
+    -fx-background-color: rgba(0, 0, 0, 0.5) !important;
+    -fx-background-radius: 12;
+}
+
+.boton-menu .text, .boton-menu.label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.icono-contenedor {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-radius: 12;
+}
+
+.boton-activo .icono-contenedor {
+    -fx-background-color: rgba(255, 255, 255, 0.4);
+    -fx-border-color: white;
+}

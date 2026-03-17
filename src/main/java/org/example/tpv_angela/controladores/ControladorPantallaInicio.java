@@ -19,13 +19,13 @@ public class ControladorPantallaInicio
      * @param event evento de acción generado al pulsar el botón de Login.
      */
     public void irALogin(javafx.event.ActionEvent event)
-    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/VistaLogin.fxml", "Login");}
+    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/admin/VistaLogin.fxml", "Login");}
 
     public void irACamarero(javafx.event.ActionEvent event)
-    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/VistaMenuInicialCamarero.fxml", "Login");}
+    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/camarero/VistaMenuInicialCamarero.fxml", "Menu Inicial Camarero");}
 
     public void irACocinero(javafx.event.ActionEvent event)
-    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/VistaMenuInicialCocinero.fxml", "Login");}
+    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/cocinero/VistaMenuInicialCocinero.fxml", "Menu Inicial Cocinero");}
 }
 
 

@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="1080.0" prefWidth="1920.0" styleClass="dashboard-root" stylesheets="@../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.ControladorMenuCamarero">
+<AnchorPane prefHeight="1080.0" prefWidth="1920.0" styleClass="dashboard-root" stylesheets="@../../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.admin.ControladorMenuAdmin">
     <children>
         <VBox spacing="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -21,25 +21,25 @@
                     <children>
                         <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@../imagenes/logo.png" />
+                                <Image url="@../../imagenes/logo.png" />
                             </image>
                         </ImageView>
                         <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                             <children>
                                 <Label styleClass="header-title" text="Sistema TPV - HostelHub" />
-                                <Label prefHeight="23.0" prefWidth="302.0" styleClass="header-subtitle" text="Bienvenido, camarero">
-                           <font>
-                              <Font size="20.0" />
-                           </font></Label>
+                                <Label prefHeight="23.0" prefWidth="302.0" styleClass="header-subtitle" text="Bienvenido, administrador">
+                                    <font>
+                                        <Font size="20.0" />
+                                    </font></Label>
                             </children>
                             <HBox.margin>
                                 <Insets left="20.0" />
                             </HBox.margin>
                         </VBox>
-                        <Button mnemonicParsing="false" onAction="#cerrarSesion" styleClass="logout-button" text=" ➤ Salir">
-                     <font>
-                        <Font size="30.0" />
-                     </font>
+                        <Button mnemonicParsing="false" onAction="#cerrarSesion" styleClass="logout-button" text=" ➤ Cerrar Sesión">
+                            <font>
+                                <Font size="30.0" />
+                            </font>
                         </Button>
                     </children>
                     <padding>
@@ -63,60 +63,64 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="332.8000244140625" minHeight="10.0" prefHeight="332.8000244140625" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="397.7999633789062" minHeight="10.0" prefHeight="356.9999755859375" vgrow="SOMETIMES" />
+                  <RowConstraints />
                     </rowConstraints>
                     <children>
 
-                        <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#ventas" styleClass="menu-card" text="Gestión de Ventas" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                            <graphic>
-                                <VBox alignment="CENTER" styleClass="icon-container, bg-blue">
-                                    <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
-                                        <image><Image url="@../imagenes/ventas.png" /></image>
-                                    </ImageView>
-                                </VBox>
-                            </graphic>
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                        </Button>
-
-                        <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#mapaMesas" styleClass="menu-card" text="Mapa de Mesas" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#mapaMesas" styleClass="menu-card" text="Mapa de Mesas" GridPane.rowIndex="0">
                             <graphic>
                                 <VBox alignment="CENTER" styleClass="icon-container, bg-purple">
                                     <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
-                                        <image><Image url="@../imagenes/mesas.png" /></image>
+                                        <image><Image url="@../../imagenes/mesas.png" /></image>
                                     </ImageView>
                                 </VBox>
                             </graphic>
-                     <font>
-                        <Font size="18.0" />
-                     </font>
+                            <font>
+                                <Font size="18.0" />
+                            </font>
                         </Button>
-                        <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#menuPrincipal" styleClass="menu-card" text="Menu Principal" GridPane.columnIndex="2">
+                        <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#menuPrincipal" styleClass="menu-card" text="Menu Principal" GridPane.columnIndex="1">
                             <graphic>
                                 <VBox alignment="CENTER" styleClass="icon-container, bg-green">
                                     <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
-                                        <image><Image url="@../imagenes/menu.png" /></image>
+                                        <image><Image url="@../../imagenes/menu.png" /></image>
                                     </ImageView>
                                 </VBox>
                             </graphic>
-                     <font>
-                        <Font size="18.0" />
-                     </font>
+                            <font>
+                                <Font size="18.0" />
+                            </font>
                         </Button>
-                        <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#cierreCaja" styleClass="menu-card" text="Cierre de Caja" GridPane.rowIndex="1">
+                        <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#cierreCaja" styleClass="menu-card" text="Cierre de Caja" GridPane.columnIndex="2">
                             <graphic>
                                 <VBox alignment="CENTER" styleClass="icon-container, bg-red">
                                     <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
-                                        <image><Image url="@../imagenes/caja.png" /></image>
+                                        <image><Image url="@../../imagenes/caja.png" /></image>
                                     </ImageView>
                                 </VBox>
                             </graphic>
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Button>
+                  <Button contentDisplay="TOP" maxHeight="Infinity" maxWidth="Infinity" mnemonicParsing="false" onAction="#compra" styleClass="menu-card" text="Compra" GridPane.rowIndex="1">
+                     <graphic>
+                        <VBox alignment="CENTER" styleClass="icon-container, bg-yellow">
+                           <children>
+                              <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../imagenes/compra.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </VBox>
+                     </graphic>
                      <font>
                         <Font size="18.0" />
                      </font>
-                        </Button>
+                  </Button>
 
                     </children>
                     <padding>

@@ -12,4 +12,10 @@ module org.example.tpv_angela {
     exports org.example.tpv_angela;
     exports org.example.tpv_angela.controladores;
     opens org.example.tpv_angela.controladores to javafx.fxml;
+    exports org.example.tpv_angela.controladores.camarero;
+    opens org.example.tpv_angela.controladores.camarero to javafx.fxml;
+    exports org.example.tpv_angela.controladores.admin;
+    opens org.example.tpv_angela.controladores.admin to javafx.fxml;
+    exports org.example.tpv_angela.controladores.cocinero;
+    opens org.example.tpv_angela.controladores.cocinero to javafx.fxml;
 }
