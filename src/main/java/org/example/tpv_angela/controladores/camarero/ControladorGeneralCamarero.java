@@ -6,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import org.example.tpv_angela.ControladorAlertas;
+import org.example.tpv_angela.DAO.DAOArqueoCaja;
 import org.example.tpv_angela.Navegacion;
 import org.example.tpv_angela.controladores.TecladoTactil;
 
@@ -18,12 +20,16 @@ public class ControladorGeneralCamarero {
 
     @FXML private AnchorPane contentArea;
     @FXML private Button btnInicio, btnVentas, btnMapa, btnMenu, btnArqueo;
+    private final DAOArqueoCaja daoArqueo = new DAOArqueoCaja();
 
     /**
      * Carga la vista inicial y marca automáticamente el botón correspondiente
      * @param fxmlInterno ruta FXML interna que se debe cargar.
      */
     public void setVistaInicial(String fxmlInterno) {
+        if ((fxmlInterno.contains("VistaVentas") || fxmlInterno.contains("VistaMapaMesas")) && ventasBloqueadas()) {
+            fxmlInterno = "/org/example/tpv_angela/vistas/camarero/VistaCaja.fxml";
+        }
         // 1. Cargamos el contenido en el centro
         cambiarContenidoCentral(fxmlInterno);
 
@@ -45,6 +51,9 @@ public class ControladorGeneralCamarero {
      */
     @FXML
     private void clickVentas() {
+        if (ventasBloqueadas()) {
+            return;
+        }
         cambiarContenidoCentral("/org/example/tpv_angela/vistas/camarero/VistaVentas.fxml");
         marcarBoton(btnVentas);
     }
@@ -54,6 +63,9 @@ public class ControladorGeneralCamarero {
      */
     @FXML
     private void clickMapa() {
+        if (ventasBloqueadas()) {
+            return;
+        }
         cambiarContenidoCentral("/org/example/tpv_angela/vistas/VistaMapaMesas.fxml");
         marcarBoton(btnMapa);
     }
@@ -145,5 +157,16 @@ public class ControladorGeneralCamarero {
             System.err.println("ERROR CRÍTICO: Fallo al cargar la subvista");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Comprueba el cierre del dia antes de abrir pantallas de venta.
+     */
+    private boolean ventasBloqueadas() {
+        if (!daoArqueo.cajaCerradaCamareroHoy()) {
+            return false;
+        }
+        ControladorAlertas.mostrar("VENTA BLOQUEADA", "La caja del dia ya esta cerrada. No se pueden realizar mas cobros.");
+        return true;
     }
 }

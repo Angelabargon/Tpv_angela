@@ -10,6 +10,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import org.bson.Document;
+import org.example.tpv_angela.ControladorAlertas;
+import org.example.tpv_angela.DAO.DAOArqueoCaja;
 import org.example.tpv_angela.DAO.DAOMenu;
 import org.example.tpv_angela.Navegacion;
 
@@ -24,6 +26,7 @@ public class ControladorMapaMesas {
     @FXML private Label lblResumen;
 
     private final DAOMenu menuDAO = new DAOMenu();
+    private final DAOArqueoCaja daoArqueo = new DAOArqueoCaja();
     private boolean modoEdicionAdmin;
     private Runnable alGuardarPosicion;
     private double offsetArrastreX;
@@ -276,6 +279,11 @@ public class ControladorMapaMesas {
      * @param numeroMesa número o documento de la mesa implicada.
      */
     private void abrirVentasConMesa(ActionEvent event, int numeroMesa) {
+        if (daoArqueo.cajaCerradaCamareroHoy()) {
+            ControladorAlertas.mostrar("VENTA BLOQUEADA", "La caja del dia ya esta cerrada. No se pueden realizar mas cobros.");
+            return;
+        }
+
         ControladorVentas.setMesaInicialPendiente(numeroMesa);
 
         FXMLLoader loader = Navegacion.cambiarVista(

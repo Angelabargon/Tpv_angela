@@ -54,7 +54,7 @@ public class DAOArqueoCaja {
      * @return documento con la información solicitada.
      */
     public Document guardarArqueoCamarero(double efectivoDeclarado, double tarjetaDeclarada, String observaciones) {
-        if (existeArqueoCamareroHoy()) {
+        if (cajaCerradaCamareroHoy()) {
             throw new IllegalStateException("El arqueo del día ya esta guardado.");
         }
         ResumenDia resumen = obtenerResumenHoy();
@@ -90,10 +90,28 @@ public class DAOArqueoCaja {
     }
 
     /**
+     * Comprueba si el camarero ya ha cerrado la caja o guardado el arqueo del dia.
+     * @return true si la venta debe quedar bloqueada; false en caso contrario.
+     */
+    public boolean cajaCerradaCamareroHoy() {
+        return coleccionArqueos.countDocuments(Filters.and(
+                Filters.eq("dia", formatoDia.format(new Date())),
+                Filters.eq("rol", "CAMARERO"),
+                Filters.or(
+                        Filters.exists("efectivoDeclarado", true),
+                        Filters.eq("estado", "CERRADA")
+                )
+        )) > 0;
+    }
+
+    /**
      * Cierra la vista o finaliza el flujo activo.
      * @return documento con la información solicitada.
      */
     public Document cerrarCajaCamarero() {
+        if (cajaCerradaCamareroHoy()) {
+            throw new IllegalStateException("La caja del dia ya esta cerrada.");
+        }
         ResumenDia resumen = obtenerResumenHoy();
         Document cierre = new Document("fecha", new Date())
                 .append("dia", resumen.dia)
@@ -230,8 +248,7 @@ public class DAOArqueoCaja {
             return ((Number) valorDirecto).doubleValue();
         }
 
-        String metodo = String.valueOf(cuenta.get("metodoPago", "")).toUpperCase();
-        return metodo.contains(metodoBuscado) ? numero(cuenta.get("total")) : 0.0;
+        return metodoCobro(cuenta).equals(metodoBuscado) ? numero(cuenta.get("total")) : 0.0;
     }
 
     /**
@@ -255,9 +272,23 @@ public class DAOArqueoCaja {
 
         List<Document> pagoUnico = new ArrayList<>();
         pagoUnico.add(new Document("fecha", cuenta.get("fecha"))
-                .append("metodoPago", cuenta.get("metodoPago", ""))
+                .append("metodoPago", metodoPagoDetalle(cuenta))
                 .append("importe", numero(cuenta.get("total"))));
         return pagoUnico;
+    }
+
+    /**
+     * Obtiene el texto de metodo de pago que se muestra en el detalle.
+     * @param cuenta documento de cuenta o venta.
+     * @return metodo de pago visible.
+     */
+    private String metodoPagoDetalle(Document cuenta) {
+        String metodo = String.valueOf(cuenta.get("metodoPago", ""));
+        String metodoReal = metodoCobro(cuenta);
+        if (!metodoReal.isBlank()) {
+            return metodoReal;
+        }
+        return metodo;
     }
 
     /**
@@ -273,7 +304,31 @@ public class DAOArqueoCaja {
         if (tarjeta > 0) {
             return "TARJETA";
         }
+        if (efectivo <= 0) {
+            return "SIN COBRO";
+        }
         return "EFECTIVO";
+    }
+
+    /**
+     * Obtiene el metodo de cobro real de una venta, incluyendo cobros separados antiguos.
+     * @param venta venta o cuenta que se comprueba.
+     * @return EFECTIVO, TARJETA o texto vacio si no se puede clasificar.
+     */
+    private String metodoCobro(Document venta) {
+        String metodo = String.valueOf(venta.get("metodoPago", "")).toUpperCase();
+        String tipo = String.valueOf(venta.get("tipo", "")).toUpperCase();
+
+        if (metodo.contains("EFECTIVO") || tipo.contains("EFECTIVO")) {
+            return "EFECTIVO";
+        }
+        if (metodo.contains("TARJETA") || tipo.contains("TARJETA")) {
+            return "TARJETA";
+        }
+        if (metodo.contains("SEPARADO")) {
+            return "EFECTIVO";
+        }
+        return "";
     }
 
     /**
@@ -291,14 +346,16 @@ public class DAOArqueoCaja {
                 Filters.lte("fecha", fin)
         ))) {
             double total = numero(venta.get("total"));
-            String metodo = String.valueOf(venta.get("metodoPago", "")).toUpperCase();
+            String metodo = metodoCobro(venta);
 
-            resumen.totalVentas += total;
-            resumen.numeroVentas++;
-            if (metodo.contains("EFECTIVO")) {
+            if (metodo.equals("EFECTIVO")) {
+                resumen.totalVentas += total;
                 resumen.ventasEfectivo += total;
-            } else if (metodo.contains("TARJETA")) {
+                resumen.numeroVentas++;
+            } else if (metodo.equals("TARJETA")) {
+                resumen.totalVentas += total;
                 resumen.ventasTarjeta += total;
+                resumen.numeroVentas++;
             }
         }
         return resumen;

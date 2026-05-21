@@ -18,6 +18,7 @@ public class DAOVentas {
     private final MongoCollection<Document> coleccionVentas;
     private final MongoCollection<Document> coleccionMesas;
     private final MongoCollection<Document> coleccionCuentasDia;
+    private final MongoCollection<Document> coleccionArqueos;
     private final SimpleDateFormat formatoDia = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
@@ -30,6 +31,7 @@ public class DAOVentas {
                 ? db.getCollection("Mesas")
                 : db.getCollection("mesas");
         this.coleccionCuentasDia = db.getCollection("cuentas_dia");
+        this.coleccionArqueos = db.getCollection("arqueos_caja");
     }
 
     /**
@@ -52,6 +54,7 @@ public class DAOVentas {
      * @param ticketId identificador del ticket.
      */
     public void registrarVenta(int numMesa, List<String> items, double total, String metodo, String ticketId) {
+        validarCajaAbierta();
         Date fecha = new Date();
         Document venta = new Document("fecha", fecha)
                 .append("mesa", numMesa)
@@ -74,15 +77,17 @@ public class DAOVentas {
      * @param tipoSeparacion tipo de separación o cobro realizado.
      */
     public void registrarSeparacion(int numMesa, List<String> items, double total, String tipoSeparacion) {
+        validarCajaAbierta();
         Date fecha = new Date();
+        String metodoPago = metodoPagoSeparacion(tipoSeparacion);
         Document venta = new Document("fecha", fecha)
                 .append("mesa", numMesa)
                 .append("productos", items)
                 .append("total", total)
-                .append("metodoPago", "SEPARADO")
+                .append("metodoPago", metodoPago)
                 .append("tipo", tipoSeparacion);
         coleccionVentas.insertOne(venta);
-        registrarCuentaDia(fecha, numMesa, items, total, "SEPARADO", tipoSeparacion, null);
+        registrarCuentaDia(fecha, numMesa, items, total, metodoPago, tipoSeparacion, null);
     }
 
     /**
@@ -172,12 +177,52 @@ public class DAOVentas {
     }
 
     /**
+     * Conserva el metodo de pago real cuando un cobro viene del flujo de separacion.
+     * @param tipoSeparacion texto recibido por compatibilidad con llamadas existentes.
+     * @return metodo de pago a guardar.
+     */
+    private String metodoPagoSeparacion(String tipoSeparacion) {
+        String tipo = tipoSeparacion == null ? "" : tipoSeparacion.toUpperCase();
+        if (tipo.contains("TARJETA")) {
+            return "TARJETA";
+        }
+        if (tipo.contains("EFECTIVO")) {
+            return "EFECTIVO";
+        }
+        throw new IllegalArgumentException("El cobro separado debe indicar EFECTIVO o TARJETA.");
+    }
+
+    /**
      * Convierte el valor recibido a número decimal de forma segura.
      * @param valor valor que se procesa.
      * @return valor numérico calculado.
      */
     private double numero(Object valor) {
         return valor instanceof Number ? ((Number) valor).doubleValue() : 0.0;
+    }
+
+    /**
+     * Evita registrar cobros despues del arqueo o cierre de caja del dia.
+     */
+    private void validarCajaAbierta() {
+        if (cajaCerradaHoy()) {
+            throw new IllegalStateException("La caja del dia ya esta cerrada. No se pueden registrar mas ventas.");
+        }
+    }
+
+    /**
+     * Comprueba si el arqueo o cierre del camarero ya se ha registrado hoy.
+     * @return true si la caja esta cerrada; false si todavia se puede vender.
+     */
+    public boolean cajaCerradaHoy() {
+        return coleccionArqueos.countDocuments(Filters.and(
+                Filters.eq("dia", formatoDia.format(new Date())),
+                Filters.eq("rol", "CAMARERO"),
+                Filters.or(
+                        Filters.exists("efectivoDeclarado", true),
+                        Filters.eq("estado", "CERRADA")
+                )
+        )) > 0;
     }
     // Método para obtener el ticket actual de una mesa (Para que no se borre al navegar)
     /**

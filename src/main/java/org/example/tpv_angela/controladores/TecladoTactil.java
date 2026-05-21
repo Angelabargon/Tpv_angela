@@ -14,16 +14,21 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Window;
 
+import java.text.Normalizer;
+import java.util.Locale;
+
 /**
  * Componente reutilizable que muestra un teclado tactil sobre los campos de texto.
  */
 public final class TecladoTactil {
     private static final Object INSTALADO = new Object();
+    private static final Object NUMERICO = new Object();
     private static final Object CIERRE_FUERA_INSTALADO = new Object();
     private static final Popup popup = new Popup();
     private static final VBox teclado = new VBox(8);
     private static TextInputControl campoActivo;
     private static boolean mayusculas = true;
+    private static boolean modoNumerico = false;
     private static boolean movidoManual = false;
     private static double desfaseX;
     private static double desfaseY;
@@ -52,6 +57,21 @@ public final class TecladoTactil {
     public static void instalar(Parent root) {
         instalarCierreAlTocarFuera(root);
         instalarEnNodo(root);
+    }
+
+    /**
+     * Instala un teclado tactil numerico en un campo concreto.
+     * @param campo campo donde se escribe el importe o numero.
+     */
+    public static void instalarNumerico(TextInputControl campo) {
+        if (campo == null) {
+            return;
+        }
+        campo.getProperties().put(NUMERICO, true);
+        if (campo.getProperties().containsKey(INSTALADO)) {
+            return;
+        }
+        instalarEnNodo(campo);
     }
 
     /**
@@ -117,6 +137,11 @@ public final class TecladoTactil {
      */
     private static void mostrar(TextInputControl campo) {
         campoActivo = campo;
+        boolean numerico = esCampoNumerico(campo);
+        if (modoNumerico != numerico) {
+            modoNumerico = numerico;
+            reconstruirTeclado();
+        }
         Scene scene = campo.getScene();
         if (scene == null) {
             return;
@@ -130,18 +155,80 @@ public final class TecladoTactil {
             popup.show(window);
         }
 
-        double ancho = Math.min(980, Math.max(760, window.getWidth() * 0.62));
+        double ancho = modoNumerico ? 360 : Math.min(980, Math.max(760, window.getWidth() * 0.62));
         teclado.setPrefWidth(ancho);
         if (!movidoManual) {
             popup.setX(window.getX() + (window.getWidth() - ancho) / 2);
-            popup.setY(window.getY() + window.getHeight() - 335);
+            popup.setY(window.getY() + window.getHeight() - (modoNumerico ? 315 : 335));
         }
+    }
+
+    /**
+     * Detecta campos que solo deben recibir numeros o importes.
+     * @param campo campo de texto que se evalua.
+     * @return true si debe abrirse el teclado numerico.
+     */
+    private static boolean esCampoNumerico(TextInputControl campo) {
+        if (campo.getProperties().containsKey(NUMERICO)) {
+            return true;
+        }
+
+        String descripcion = normalizar(
+                valor(campo.getId()) + " " +
+                        valor(campo.getPromptText()) + " " +
+                        valor(campo.getAccessibleText())
+        );
+
+        return descripcion.contains("precio")
+                || descripcion.contains("numero")
+                || descripcion.contains("mesa")
+                || descripcion.contains("capacidad")
+                || descripcion.contains("cantidad")
+                || descripcion.contains("importe")
+                || descripcion.contains("efectivo")
+                || descripcion.contains("tarjeta")
+                || descripcion.contains("total")
+                || descripcion.contains("contado")
+                || descripcion.contains("datafono")
+                || descripcion.contains("recibido");
+    }
+
+    /**
+     * Normaliza texto para comparar sin mayusculas ni acentos.
+     * @param texto texto original.
+     * @return texto normalizado.
+     */
+    private static String normalizar(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Devuelve un texto seguro para concatenar descriptores del campo.
+     * @param texto texto que se procesa.
+     * @return texto no nulo.
+     */
+    private static String valor(String texto) {
+        return texto == null ? "" : texto;
     }
 
     /**
      * Método auxiliar usado por esta clase.
      */
     private static void reconstruirTeclado() {
+        if (modoNumerico) {
+            teclado.getChildren().setAll(
+                    crearCabecera(),
+                    crearFilaNumerica("789"),
+                    crearFilaNumerica("456"),
+                    crearFilaNumerica("123"),
+                    crearFilaNumerica("0,."),
+                    crearFilaAccionesNumericas()
+            );
+            return;
+        }
+
         teclado.getChildren().setAll(
                 crearCabecera(),
                 crearFila("1234567890"),
@@ -197,6 +284,21 @@ public final class TecladoTactil {
     }
 
     /**
+     * Crea una fila del teclado numerico.
+     * @param numeros numeros o separadores decimales de la fila.
+     * @return fila construida.
+     */
+    private static HBox crearFilaNumerica(String numeros) {
+        HBox fila = new HBox(8);
+        fila.setAlignment(Pos.CENTER);
+        for (int i = 0; i < numeros.length(); i++) {
+            String texto = numeros.substring(i, i + 1);
+            fila.getChildren().add(crearTecla(texto, () -> insertar(texto), 82));
+        }
+        return fila;
+    }
+
+    /**
      * Crea un componente o estructura auxiliar usada por la aplicación.
      * @return resultado calculado por el método.
      */
@@ -211,6 +313,23 @@ public final class TecladoTactil {
         fila.getChildren().add(crearTecla("Espacio", () -> insertar(" "), 230));
         fila.getChildren().add(crearTecla(".", () -> insertar("."), 62));
         fila.getChildren().add(crearTecla(",", () -> insertar(","), 62));
+        fila.getChildren().add(crearTecla("Limpiar", () -> {
+            if (campoActivo != null) {
+                campoActivo.clear();
+            }
+        }, 116));
+        fila.getChildren().add(crearTecla("Cerrar", popup::hide, 116));
+        return fila;
+    }
+
+    /**
+     * Crea las acciones del teclado numerico.
+     * @return fila de acciones.
+     */
+    private static HBox crearFilaAccionesNumericas() {
+        HBox fila = new HBox(8);
+        fila.setAlignment(Pos.CENTER);
+        fila.getChildren().add(crearTecla("Borrar", TecladoTactil::borrar, 116));
         fila.getChildren().add(crearTecla("Limpiar", () -> {
             if (campoActivo != null) {
                 campoActivo.clear();

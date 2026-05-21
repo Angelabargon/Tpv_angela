@@ -2,6 +2,7 @@ package org.example.tpv_angela.controladores.camarero;
 
 import com.lowagie.text.Element;
 import com.lowagie.text.Document;
+import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.PdfPTable;
@@ -26,6 +27,7 @@ import org.example.tpv_angela.modelos.Producto;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -133,6 +135,10 @@ public class ControladorVentas {
      * @param numMesa número de mesa.
      */
     private void abrirMesa(int numMesa) {
+        if (ventasDAO.cajaCerradaHoy()) {
+            bloquearVentaPorCajaCerrada();
+            return;
+        }
         if (!menuDAO.existeMesa(numMesa)) {
             ControladorAlertas.mostrar("ERROR", "La mesa " + numMesa + " no existe.");
             buffer = "";
@@ -208,6 +214,10 @@ public class ControladorVentas {
      * @param p producto seleccionado.
      */
     private void anadirAlTicket(Producto p) {
+        if (ventasDAO.cajaCerradaHoy()) {
+            bloquearVentaPorCajaCerrada();
+            return;
+        }
         if (lblMesaActiva.getText().equals("MESA: -") || mesaCerrada) return;
         String linea = p.getNombre() + " .... " + String.format("%.2f", p.getPrecio()) + " \u20AC";
         listaTicket.getItems().add(linea);
@@ -356,6 +366,10 @@ public class ControladorVentas {
      */
     private void ejecutarCobro(String metodo) {
         try {
+            if (ventasDAO.cajaCerradaHoy()) {
+                bloquearVentaPorCajaCerrada();
+                return;
+            }
             double montoEntregado = buffer.isEmpty() ? totalAcumulado : Double.parseDouble(buffer.replace(",", "."));
             double cambio = Math.max(0.0, montoEntregado - totalAcumulado);
             double montoAPagarAhora = Math.min(montoEntregado, totalAcumulado);
@@ -394,7 +408,7 @@ public class ControladorVentas {
                     ControladorAlertas.mostrar(
                             "FINALIZADO",
                             "Cobrado en efectivo: " + String.format("%.2f \u20AC", montoEntregado)
-                                    + "\nDevuelto: " + String.format("%.2f \u20AC", cambio)
+                                    + "\nA devolver: " + String.format("%.2f \u20AC", cambio)
                     );
                 } else {
                     ControladorAlertas.mostrar("FINALIZADO", "Mesa cobrada integramente. Recibo en /recibos.");
@@ -411,6 +425,8 @@ public class ControladorVentas {
                     ControladorAlertas.mostrar("PAGO PARCIAL", "Cobro anotado. Faltan: " + String.format("%.2f", totalAcumulado) + " \u20AC");
                 }
             }
+        } catch (IllegalStateException e) {
+            bloquearVentaPorCajaCerrada();
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -425,21 +441,46 @@ public class ControladorVentas {
             File folder = new File(carpeta);
             if (!folder.exists()) folder.mkdirs();
 
-            String nombre = String.format("%s/Ticket_Mesa%d_%s.pdf", carpeta, numMesa, new java.text.SimpleDateFormat("MMddHHmm").format(new Date()));
+            SimpleDateFormat sdfArchivoFecha = new SimpleDateFormat("ddMM");
+            SimpleDateFormat sdfArchivoHora = new SimpleDateFormat("HHmm");
+            sdfArchivoFecha.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+            sdfArchivoHora.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+            Date ahora = new Date();
+            String nombre = String.format(
+                    "%s/Ticket_Mesa%d_%s_%s.pdf",
+                    carpeta,
+                    numMesa,
+                    sdfArchivoFecha.format(ahora),
+                    sdfArchivoHora.format(ahora)
+            );
+
             Document doc = new Document();
             PdfWriter.getInstance(doc, new FileOutputStream(nombre));
 
             doc.setMargins(20, 20, 20, 20);
             doc.open();
 
-            com.lowagie.text.Font fBold = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 12, com.lowagie.text.Font.BOLD);
-            com.lowagie.text.Font fNormal = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 10, com.lowagie.text.Font.NORMAL);
-            com.lowagie.text.Font fSmall = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.NORMAL);
+            com.lowagie.text.Font fBold = new com.lowagie.text.Font(Font.TIMES_ROMAN, 12, com.lowagie.text.Font.BOLD);
+            com.lowagie.text.Font fNormal = new com.lowagie.text.Font(Font.TIMES_ROMAN, 10, com.lowagie.text.Font.NORMAL);
+            com.lowagie.text.Font fSmall = new com.lowagie.text.Font(Font.TIMES_ROMAN, 9, com.lowagie.text.Font.NORMAL);
 
-            Paragraph titulo = new Paragraph("TPV_ABG - TICKET\n", fBold);
+            Paragraph titulo = new Paragraph();
+            titulo.setFont(fBold);
+            titulo.add("HOSTELHUB - TICKET");
             titulo.setAlignment(Element.ALIGN_CENTER);
+            titulo.setSpacingAfter(8f);
             doc.add(titulo);
-            doc.add(new Paragraph("Mesa: " + numMesa + " | " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date()), fSmall));
+            SimpleDateFormat sdfTicket =
+                    new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+            sdfTicket.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+
+            doc.add(new Paragraph(
+                    "Mesa: " + numMesa + " | " +
+                            sdfTicket.format(ahora),
+                    fNormal
+            ));
+            doc.add(new Paragraph(" "));
             doc.add(new Paragraph("------------------------------------------------------------------"));
 
             PdfPTable tabla = new PdfPTable(2);
@@ -453,6 +494,13 @@ public class ControladorVentas {
             h2.setHorizontalAlignment(Element.ALIGN_RIGHT);
             tabla.addCell(h1);
             tabla.addCell(h2);
+
+            PdfPCell espacioItem = new PdfPCell(new Paragraph(" ", fSmall));
+            PdfPCell espacioPrecio = new PdfPCell(new Paragraph(" ", fSmall));
+            espacioItem.setBorder(0);
+            espacioPrecio.setBorder(0);
+            tabla.addCell(espacioItem);
+            tabla.addCell(espacioPrecio);
 
             for (String linea : listaTicket.getItems()) {
                 String[] partes = separarLineaTicket(linea);
@@ -501,7 +549,7 @@ public class ControladorVentas {
             doc.add(new Paragraph("COBRADO EN TARJETA: " + String.format("%.2f", pagadoTarjetaAcumulado) + " \u20AC", fSmall));
 
             doc.add(new Paragraph("\n"));
-            Paragraph g = new Paragraph("Gracias por su visita!", fNormal);
+            Paragraph g = new Paragraph("Gracias por su visita!", fBold);
             g.setAlignment(Element.ALIGN_CENTER);
             doc.add(g);
 
@@ -673,6 +721,19 @@ public class ControladorVentas {
     private void limpiarBuffer() {
         buffer = "";
         lblDisplay.setText("0");
+    }
+
+    /**
+     * Avisa al usuario de que la caja ya se ha cerrado y deja la venta sin mesa activa.
+     */
+    private void bloquearVentaPorCajaCerrada() {
+        ControladorAlertas.mostrar("VENTA BLOQUEADA", "La caja del dia ya esta cerrada. No se pueden realizar mas cobros.");
+        mesaCerrada = true;
+        acordeonMenu.setDisable(true);
+        lblMesaActiva.setText("MESA: -");
+        mesaActual = -1;
+        ticketActualId = null;
+        limpiarBuffer();
     }
     /**
      * Atiende la acción disparada desde la interfaz de usuario.

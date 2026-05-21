@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import org.example.tpv_angela.ControladorAlertas;
 import org.example.tpv_angela.DAO.DAOMenu;
 import org.example.tpv_angela.DAO.DAOVentas;
+import org.example.tpv_angela.controladores.TecladoTactil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class ControladorSepararMesa {
         if (listaItems == null) {
             return;
         }
+        TecladoTactil.instalarNumerico(txtEfectivoRecibido);
 
         listaItems.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listaItems.setCellFactory(lista -> {
@@ -105,6 +107,12 @@ public class ControladorSepararMesa {
     }
 
     private void cobrarSeleccionados(String metodo) {
+        if (ventasDAO.cajaCerradaHoy()) {
+            ControladorAlertas.mostrar("Venta bloqueada", "La caja del dia ya esta cerrada. No se pueden realizar mas cobros.");
+            cerrarVentana();
+            return;
+        }
+
         List<String> seleccionados = listaItems.getSelectionModel().getSelectedItems();
         if (seleccionados == null || seleccionados.isEmpty()) {
             ControladorAlertas.mostrar("Sin selección", "Selecciona al menos un producto para cobrar.");
@@ -126,7 +134,13 @@ public class ControladorSepararMesa {
             devuelto = recibido - totalSeleccionado;
         }
 
-        ventasDAO.registrarVenta(numMesa, cobrados, totalSeleccionado, metodo, ticketId);
+        try {
+            ventasDAO.registrarVenta(numMesa, cobrados, totalSeleccionado, metodo, ticketId);
+        } catch (IllegalStateException e) {
+            ControladorAlertas.mostrar("Venta bloqueada", "La caja del dia ya esta cerrada. No se pueden realizar mas cobros.");
+            cerrarVentana();
+            return;
+        }
         for (String item : cobrados) {
             menuDAO.eliminarProductoDeMesa(numMesa, item);
         }

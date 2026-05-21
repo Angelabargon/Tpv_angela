@@ -23,6 +23,7 @@ import org.example.tpv_angela.DAO.DAOArqueoCaja;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Controlador de la vista de arqueo de caja utilizada por el camarero.
@@ -135,6 +136,17 @@ public class ControladorCajaCamarero {
      */
     @FXML
     private void cerrarCaja() {
+        if (daoArqueo.cajaCerradaCamareroHoy()) {
+            cargarDatos();
+            ControladorAlertas.mostrarConAccion(
+                    "Caja ya cerrada",
+                    "La caja del dia ya esta cerrada y no se pueden registrar mas ventas.",
+                    lblDia,
+                    "APAGAR SISTEMA",
+                    Platform::exit
+            );
+            return;
+        }
         daoArqueo.cerrarCajaCamarero();
         cargarDatos();
         ControladorAlertas.mostrarConAccion(
@@ -199,9 +211,14 @@ public class ControladorCajaCamarero {
      * @param valor valor que se procesa.
      * @return texto formateado o normalizado.
      */
-    private String formatearFecha(Object valor) {
-        if (valor instanceof Date fecha) {
-            return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(fecha);
+    private String formatearFecha(Object valor)
+    {
+        if (valor instanceof Date fecha)
+        {
+            SimpleDateFormat sdf =
+                    new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            sdf.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+            return sdf.format(fecha);
         }
         return "";
     }
