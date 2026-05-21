@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane styleClass="mapa-root" stylesheets="@../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.camarero.ControladorMapaMesas">
+    <top>
+        <VBox spacing="8" styleClass="mapa-header">
+            <padding>
+                <Insets bottom="18" left="28" right="28" top="24" />
+            </padding>
+            <Label styleClass="section-title" text="Mapa de mesas" />
+            <HBox spacing="18">
+                <Label styleClass="leyenda-mesa leyenda-libre" text="Libre / cobrada" />
+                <Label styleClass="leyenda-mesa leyenda-ocupada" text="Con productos" />
+                <Label styleClass="leyenda-mesa leyenda-precuenta" text="Precuenta impresa" />
+            </HBox>
+            <Label fx:id="lblResumen" styleClass="mapa-resumen" text="Libres: 0   Ocupadas: 0   Precuenta: 0" />
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="false" pannable="true" styleClass="mapa-scroll">
+            <content>
+                <AnchorPane fx:id="contenedorMesas" minHeight="820" minWidth="1500" prefHeight="820" prefWidth="1500" styleClass="mapa-salon">
+                    <children>
+                        <ImageView fitHeight="820" layoutX="59" layoutY="0" mouseTransparent="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../imagenes/fondo_barra.png" />
+                            </image>
+                        </ImageView>
+                        <StackPane layoutX="94" layoutY="36" prefHeight="70" prefWidth="330" styleClass="barra-camareros barra-corta" />
+                        <StackPane layoutX="86" layoutY="126" prefHeight="72" prefWidth="408" styleClass="frente-barra" />
+                        <StackPane layoutX="930" layoutY="120" prefHeight="610" prefWidth="62" styleClass="paso-separador" />
+                        <StackPane layoutX="962" layoutY="352" prefHeight="148" prefWidth="16" styleClass="puerta-acceso" />
+                        <StackPane layoutX="1018" layoutY="94" prefHeight="652" prefWidth="404" styleClass="zona-terraza" />
+                    </children>
+                </AnchorPane>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

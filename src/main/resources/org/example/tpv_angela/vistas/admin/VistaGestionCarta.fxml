@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane styleClass="ventas-container" stylesheets="@../../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.admin.ControladorGestionCarta">
+    <padding>
+        <Insets bottom="120" left="20" right="20" top="20" />
+    </padding>
+    <left>
+        <VBox spacing="14.0" styleClass="menu-side-panel" BorderPane.alignment="CENTER">
+            <children>
+                <Label styleClass="section-title" text="Menú fijo" />
+                <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+                    <content>
+                        <Accordion fx:id="acordeonProductos" />
+                    </content>
+                </ScrollPane>
+                <HBox spacing="10">
+                    <children>
+                        <Button onAction="#eliminarSeleccionado" styleClass="login-button" text="Eliminar seleccionado" />
+                        <Button onAction="#modificarSeleccionado" styleClass="logout-button" text="Modificar" />
+                        <Button onAction="#refrescar" styleClass="logout-button" text="Refrescar" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="14.0" styleClass="form-panel">
+            <children>
+                <Label fx:id="lblTituloFormulario" styleClass="section-title" text="Añadir plato" />
+                <TextField fx:id="txtNombre" promptText="Nombre" styleClass="input-field" />
+                <TextField fx:id="txtCategoria" promptText="Categoría" styleClass="input-field" />
+                <TextField fx:id="txtSubcategoria" promptText="Subcategoría" styleClass="input-field" />
+                <TextField fx:id="txtPrecio" promptText="Precio" styleClass="input-field" />
+                <HBox spacing="10">
+                    <children>
+                        <Button fx:id="btnSeleccionarImagen" maxWidth="Infinity" onAction="#seleccionarImagenLocal" styleClass="logout-button" text="Seleccionar imagen" HBox.hgrow="ALWAYS" />
+                    </children>
+                </HBox>
+                <Button fx:id="btnGuardarProducto" onAction="#agregarProducto" styleClass="login-button" text="Añadir al menú fijo" />
+                <Button fx:id="btnCancelarEdicion" managed="false" onAction="#cancelarEdicion" styleClass="logout-button" text="Cancelar edición" visible="false" />
+                <Label fx:id="lblEstado" text="Estado" />
+            </children>
+            <padding>
+                <Insets right="40.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>

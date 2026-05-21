@@ -7,8 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import org.example.tpv_angela.Navegacion;
+import org.example.tpv_angela.controladores.TecladoTactil;
 import java.io.IOException;
 
+/**
+ * Controlador principal que coordina la navegación del área de cocina.
+ */
 public class ControladorGeneralCocinero {
 
     @FXML private AnchorPane contentArea;
@@ -16,6 +20,7 @@ public class ControladorGeneralCocinero {
 
     /**
      * Carga la vista inicial y marca el botón correspondiente comparando la ruta
+     * @param fxmlInterno ruta FXML interna que se debe cargar.
      */
     public void setVistaInicial(String fxmlInterno) {
         // 1. Cargamos el contenido en el centro
@@ -31,29 +36,47 @@ public class ControladorGeneralCocinero {
         }
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     * @param event evento que dispara la acción.
+     */
     @FXML
     private void clickSalir(ActionEvent event) {
         Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/VistaPantallaInicio.fxml", "Inicio");
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     */
     @FXML
     private void clickMenuComida() {
         cambiarContenidoCentral("/org/example/tpv_angela/vistas/cocinero/VistaMenuComidaCocinero.fxml");
         marcarBoton(btnMenu);
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     */
     @FXML
     private void clickListaCompra() {
         cambiarContenidoCentral("/org/example/tpv_angela/vistas/cocinero/VistaListaCompra.fxml");
         marcarBoton(btnListaCompra);
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     * @param event evento que dispara la acción.
+     */
     @FXML
     private void clickInicio(ActionEvent event) {
         // Al volver al menú de botones grandes, cambiamos la escena completa
-        Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/cocinero/VistaMenuInicialCocinero.fxml", "Menu Inicial Cocinero");
+        Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/cocinero/VistaMenuInicialCocinero.fxml", "Menú Inicial Cocinero");
     }
 
+    /**
+     * Ejecuta la operación asociada a este controlador o servicio.
+     * @param bSeleccionado botón que debe quedar marcado como seleccionado.
+     */
     private void marcarBoton(Button bSeleccionado) {
         Button[] botones = {btnInicio, btnMenu, btnListaCompra};
         for (Button b : botones) {
@@ -66,9 +89,14 @@ public class ControladorGeneralCocinero {
         }
     }
 
+    /**
+     * Ejecuta la operación asociada a este controlador o servicio.
+     * @param fxml ruta FXML que se va a cargar.
+     */
     private void cambiarContenidoCentral(String fxml) {
         try {
             Parent view = FXMLLoader.load(getClass().getResource(fxml));
+            TecladoTactil.instalar(view);
             contentArea.getChildren().setAll(view);
 
             AnchorPane.setTopAnchor(view, 0.0);

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane styleClass="ventas-container" stylesheets="@../../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.admin.ControladorMapaMesasAdmin">
+    <padding>
+        <Insets bottom="120" left="20" right="20" top="20" />
+    </padding>
+    <left>
+        <VBox spacing="14.0" styleClass="menu-side-panel" BorderPane.alignment="CENTER">
+            <children>
+                <Label styleClass="section-title" text="Mesas" />
+                <ListView fx:id="listaMesas" prefWidth="520.0" VBox.vgrow="ALWAYS" />
+                <HBox spacing="10">
+                    <children>
+                        <Button onAction="#eliminarMesa" styleClass="login-button" text="Eliminar mesa" />
+                        <Button onAction="#modificarMesa" styleClass="logout-button" text="Modificar" />
+                        <Button onAction="#refrescar" styleClass="logout-button" text="Refrescar" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="14.0" styleClass="mapa-form-panel">
+            <children>
+                <AnchorPane fx:id="mapaHost" VBox.vgrow="ALWAYS" />
+                <Label fx:id="lblTituloFormulario" styleClass="section-title" text="Alta de mesa" />
+                <HBox spacing="10">
+                    <children>
+                        <TextField fx:id="txtNumeroMesa" promptText="Número de mesa" styleClass="input-field" />
+                        <TextField fx:id="txtCapacidad" promptText="Capacidad" styleClass="input-field" />
+                        <Button fx:id="btnGuardarMesa" onAction="#agregarMesa" styleClass="login-button" text="Añadir mesa" />
+                    </children>
+                </HBox>
+                <Button fx:id="btnCancelarEdicion" managed="false" onAction="#cancelarEdicion" styleClass="logout-button" text="Cancelar edición" visible="false" />
+                <Label fx:id="lblEstado" text="Estado" />
+            </children>
+            <padding>
+                <Insets right="40.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>

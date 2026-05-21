@@ -4,6 +4,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import org.example.tpv_angela.Navegacion;
 
+/**
+ * Controlador del menú inicial del camarero y sus accesos principales.
+ */
 public class ControladorMenuCamarero {
 
     public void cerrarSesion(ActionEvent event)
@@ -13,20 +16,20 @@ public class ControladorMenuCamarero {
     {navegarAContenedor(event, "VistaVentas.fxml");}
 
     public void mapaMesas(ActionEvent event)
-    {navegarAContenedor(event, "VistaMapaMesas.fxml");}
+    {navegarAContenedor(event, "/org/example/tpv_angela/vistas/VistaMapaMesas.fxml");}
 
     public void menuPrincipal(ActionEvent event)
-    {navegarAContenedor(event, "VistaMenuPrincipal.fxml");}
+    {navegarAContenedor(event, "/org/example/tpv_angela/vistas/VistaMenuCarta.fxml");}
 
     public void cierreCaja(ActionEvent event)
-    {navegarAContenedor(event, "VistaCierreCaja.fxml");}
+    {navegarAContenedor(event, "VistaCaja.fxml");}
 
     /**
      * Método auxiliar para cargar la carcasa y luego la vista interna
      */
     private void navegarAContenedor(ActionEvent event, String nombreVistaInterna)
     {
-        // Cargamos la vista general que contiene el menu lateral
+        // Cargamos la vista general que contiene el menú lateral
         FXMLLoader loader = Navegacion.cambiarVista(
                 event,
                 "/org/example/tpv_angela/vistas/camarero/VistaGeneralCamarero.fxml",

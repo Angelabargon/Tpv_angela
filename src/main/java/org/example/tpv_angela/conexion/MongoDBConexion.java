@@ -7,6 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.json.JSONObject;
 
+/**
+ * Gestiona la conexión compartida con MongoDB y el acceso a la base de datos de la aplicación.
+ */
 public class MongoDBConexion
 {
     private static MongoClient mongoClient;
@@ -45,8 +48,9 @@ public class MongoDBConexion
         {System.err.println("Error al conectar a MongoDB: " + e.getMessage());}
     }
 
-    /** Método para obtener la base de datos desde otras clases (Controller de JavaFX)
-     * @return
+    /**
+     * Método para obtener la base de datos desde otras clases.
+     * @return base de datos MongoDB usada por la aplicación.
      */
     public static MongoDatabase getDatabase()
     {

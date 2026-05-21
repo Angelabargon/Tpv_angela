@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="14.0" styleClass="ventas-container" stylesheets="@../../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.admin.ControladorCajaAdmin">
+    <padding>
+        <Insets bottom="120" left="20" right="20" top="20" />
+    </padding>
+    <children>
+        <Label styleClass="section-title" text="Arqueo administrador" />
+        <HBox spacing="14">
+            <Label fx:id="lblInfo" styleClass="caja-dia-label" text="Caja del dia" />
+            <Label fx:id="lblTotalTarjeta" styleClass="caja-total-tarjeta" text="Total tarjeta: 0.00 €" />
+            <Label fx:id="lblTotalEfectivo" styleClass="caja-total-efectivo" text="Total efectivo: 0.00 €" />
+            <Label fx:id="lblTotal" styleClass="caja-total-general" text="Total: 0.00 €" />
+        </HBox>
+
+        <HBox spacing="18" VBox.vgrow="ALWAYS">
+            <VBox spacing="10" styleClass="ticket-container" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblCuentasDia" styleClass="caja-section-label" text="Cuentas de dia" />
+                <TableView fx:id="tablaCuentasDia" prefHeight="230">
+                    <columns>
+                        <TableColumn fx:id="colCuentaFecha" prefWidth="220" text="Cuenta" />
+                        <TableColumn fx:id="colCuentaMesa" prefWidth="90" text="Mesa" />
+                        <TableColumn fx:id="colCuentaMetodo" prefWidth="140" text="Cobros" />
+                        <TableColumn fx:id="colCuentaTotal" prefWidth="110" text="Total" />
+                    </columns>
+                </TableView>
+                <Label styleClass="caja-section-label" text="Arqueos guardados" />
+                <TableView fx:id="tablaArqueos" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colFechaArqueo" prefWidth="160" text="Fecha" />
+                        <TableColumn fx:id="colVentasArqueo" prefWidth="120" text="Ventas" />
+                        <TableColumn fx:id="colDeclaradoArqueo" prefWidth="120" text="Declarado" />
+                        <TableColumn fx:id="colDescuadreArqueo" prefWidth="120" text="Descuadre" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <VBox prefWidth="430" spacing="12" styleClass="ticket-container">
+                <Label styleClass="caja-section-label" text="Sacar dinero de caja" />
+                <TextField fx:id="txtImporteRetirada" promptText="Importe retirado" styleClass="input-field" />
+                <TextField fx:id="txtMotivoRetirada" promptText="Motivo" styleClass="input-field" />
+                <Button maxWidth="Infinity" onAction="#registrarRetirada" prefHeight="56" styleClass="caja-action-danger" text="REGISTRAR RETIRADA" />
+                <Label styleClass="caja-section-label" text="Movimientos de caja" />
+                <TableView fx:id="tablaMovimientos" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colFechaMovimiento" prefWidth="145" text="Fecha" />
+                        <TableColumn fx:id="colImporteMovimiento" prefWidth="95" text="Importe" />
+                        <TableColumn fx:id="colMotivoMovimiento" prefWidth="160" text="Motivo" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </HBox>
+    </children>
+</VBox>

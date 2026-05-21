@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import org.example.tpv_angela.Navegacion;
 
+/**
+ * Controlador de la pantalla inicial de la aplicación.
+ */
 public class ControladorPantallaInicio
 {
     /** Botón que redirige a la vista de Login. */
@@ -22,10 +25,10 @@ public class ControladorPantallaInicio
     {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/admin/VistaLogin.fxml", "Login");}
 
     public void irACamarero(javafx.event.ActionEvent event)
-    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/camarero/VistaMenuInicialCamarero.fxml", "Menu Inicial Camarero");}
+    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/camarero/VistaMenuInicialCamarero.fxml", "Menú Inicial Camarero");}
 
     public void irACocinero(javafx.event.ActionEvent event)
-    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/cocinero/VistaMenuInicialCocinero.fxml", "Menu Inicial Cocinero");}
+    {Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/cocinero/VistaMenuInicialCocinero.fxml", "Menú Inicial Cocinero");}
 }
 
 

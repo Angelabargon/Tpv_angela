@@ -12,11 +12,11 @@
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.camarero.ControladorGeneralCamarero">
 
     <left>
-        <VBox alignment="TOP_CENTER" prefWidth="110.0" spacing="10.0" style="-fx-background-color: #e62e2e;" BorderPane.alignment="CENTER">
+        <VBox alignment="TOP_CENTER" prefWidth="110.0" spacing="10.0" styleClass="sidebar-root" BorderPane.alignment="CENTER">
             <children>
                 <AnchorPane prefHeight="120.0" prefWidth="110.0">
                     <children>
-                        <Button layoutX="15.0" layoutY="20.0" mnemonicParsing="false" onAction="#clickSalir" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                        <Button layoutX="15.0" layoutY="20.0" mnemonicParsing="false" onAction="#clickSalir" styleClass="logo-button">
                             <graphic>
                                 <ImageView fx:id="imgLogo" fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
@@ -89,6 +89,6 @@
     </left>
 
     <center>
-        <AnchorPane fx:id="contentArea" style="-fx-background-color: #FFFFFF;" BorderPane.alignment="CENTER" />
+        <AnchorPane fx:id="contentArea" styleClass="content-area" BorderPane.alignment="CENTER" />
     </center>
 </BorderPane>

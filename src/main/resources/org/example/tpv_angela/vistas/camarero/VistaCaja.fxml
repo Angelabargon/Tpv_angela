@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="14.0" styleClass="ventas-container" stylesheets="@../../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.camarero.ControladorCajaCamarero">
+    <padding>
+        <Insets bottom="120" left="20" right="20" top="20" />
+    </padding>
+    <children>
+        <Label styleClass="section-title" text="Arqueo camarero" />
+
+        <HBox spacing="18" VBox.vgrow="ALWAYS">
+            <VBox prefWidth="430" spacing="12" styleClass="ticket-container">
+                <Label fx:id="lblDia" styleClass="caja-dia-label" text="Dia" />
+                <Label fx:id="lblTotalTarjeta" styleClass="caja-total-tarjeta-grande" text="Total tarjeta: 0.00 €" />
+                <Label fx:id="lblTotalEfectivo" styleClass="caja-total-efectivo-grande" text="Total efectivo: 0.00 €" />
+                <Label fx:id="lblTotal" styleClass="caja-total-general-grande" text="Total: 0.00 €" />
+            <HBox prefHeight="51.0" prefWidth="391.0" spacing="10">
+               <children>
+                  <Label prefHeight="51.0" prefWidth="112.0" styleClass="caja-label-efectivo" text="Efectivo" />
+      
+                            <TextField fx:id="txtEfectivoDeclarado" prefHeight="51.0" prefWidth="302.0" promptText="Efectivo contado" styleClass="input-field" />
+               </children>
+            </HBox>
+            <HBox prefHeight="56.0" prefWidth="400.0" spacing="10">
+               <children>
+                  <Label prefHeight="56.0" prefWidth="112.0" styleClass="caja-label-tarjeta" text="Tarjeta" />
+                      <TextField fx:id="txtTarjetaDeclarada" prefHeight="51.0" prefWidth="302.0" promptText="Tarjeta del datafono" styleClass="input-field" />
+               </children>
+            </HBox>
+                <TextArea fx:id="txtObservaciones" prefRowCount="4" promptText="Observaciones del cierre" styleClass="input-field" wrapText="true" />
+                <Button fx:id="btnGuardarArqueo" maxWidth="Infinity" onAction="#guardarArqueo" prefHeight="58" styleClass="caja-action-success" text="GUARDAR ARQUEO DEL DIA" />
+                <Button maxWidth="Infinity" onAction="#cerrarCaja" prefHeight="58" styleClass="caja-action-dark" text="CERRAR CAJA" />
+            </VBox>
+
+            <VBox spacing="10" styleClass="ticket-container" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblCuentasDia" styleClass="caja-section-label" text="Cuentas de dia" />
+                <TableView fx:id="tablaCuentasDia" prefHeight="240">
+                    <columns>
+                        <TableColumn fx:id="colCuentaFecha" prefWidth="220" text="Cuenta" />
+                        <TableColumn fx:id="colCuentaMesa" prefWidth="90" text="Mesa" />
+                        <TableColumn fx:id="colCuentaMetodo" prefWidth="140" text="Cobros" />
+                        <TableColumn fx:id="colCuentaTotal" prefWidth="110" text="Total" />
+                    </columns>
+                </TableView>
+                <Label styleClass="caja-section-label" text="Cuentas y arqueos guardados" />
+                <TableView fx:id="tablaArqueos" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colFecha" prefWidth="170" text="Fecha" />
+                        <TableColumn fx:id="colVentas" prefWidth="130" text="Ventas" />
+                        <TableColumn fx:id="colDeclarado" prefWidth="130" text="Declarado" />
+                        <TableColumn fx:id="colDescuadre" prefWidth="130" text="Descuadre" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </HBox>
+    </children>
+</VBox>

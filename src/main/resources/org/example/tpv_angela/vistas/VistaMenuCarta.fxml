@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane styleClass="ventas-container" stylesheets="@../estilo/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.tpv_angela.controladores.ControladorMenuCarta">
+    <padding>
+        <Insets bottom="120" left="20" right="20" top="20" />
+    </padding>
+    <top>
+        <VBox spacing="8">
+            <children>
+                <Label styleClass="section-title" text="Menú" />
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <HBox spacing="24">
+            <children>
+                <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="scroll-transparente" HBox.hgrow="ALWAYS">
+                    <content>
+                        <Accordion fx:id="acordeonMenu" />
+                    </content>
+                </ScrollPane>
+                <VBox prefWidth="460.0" spacing="16" styleClass="carta-detail-panel">
+                    <children>
+                        <Label fx:id="lblNombrePlato" styleClass="alergenos-plato-title" text="Selecciona un plato" wrapText="true" />
+                        <Label fx:id="lblCategoriaPlato" styleClass="alergenos-categoria" text="Menu fijo" wrapText="true" />
+                        <Label text="Alergenos" styleClass="alergenos-heading" />
+                        <Label fx:id="lblAlergenos" styleClass="alergenos-lista" text="Sin plato seleccionado." wrapText="true" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </center>
+</BorderPane>

@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.example.tpv_angela.controladores.TecladoTactil;
 
 /**
  * Creamos la clase Navegación que almacenará los métodos encargados de los cambios entre páginas,
@@ -17,7 +18,7 @@ import javafx.stage.Stage;
 public class Navegacion {
 
     /**
-     * Creamos un metodo para cambiar de la página actual a otra, devuelve el loader para acceder a los controladores.
+     * Creamos un método para cambiar de la página actual a otra, devuelve el loader para acceder a los controladores.
      *
      * @param event  Evento que dispara la acción (ej. clic en botón).
      * @param rutaFXML  Ruta del archivo FXML de la nueva vista.
@@ -27,6 +28,9 @@ public class Navegacion {
         try {
             FXMLLoader loader = new FXMLLoader(Navegacion.class.getResource(rutaFXML));
             Parent root = loader.load();
+            if (rutaFXML.contains("/admin/") || rutaFXML.contains("/camarero/") || rutaFXML.contains("/cocinero/")) {
+                TecladoTactil.instalar(root);
+            }
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -42,7 +46,7 @@ public class Navegacion {
         }
     }
     /**
-     * Creamos un metodo cerrar una ventana y vover a la página anterior.
+     * Creamos un método cerrar una ventana y volver a la página anterior.
      *
      * @param event  Evento que dispara la acción.
      */

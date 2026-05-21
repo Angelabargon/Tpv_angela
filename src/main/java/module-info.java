@@ -6,6 +6,7 @@ module org.example.tpv_angela {
     requires org.mongodb.bson;
     requires org.json;
     requires org.mongodb.driver.core;
+    requires com.github.librepdf.openpdf;
 
 
     opens org.example.tpv_angela to javafx.fxml;

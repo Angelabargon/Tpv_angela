@@ -2,23 +2,14 @@ package org.example.tpv_angela.controladores.admin;
 
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.ColorAdjust;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.bson.Document;
 import org.example.tpv_angela.ControladorAlertas;
 import org.example.tpv_angela.DAO.DAOLogin;
 import org.example.tpv_angela.Navegacion;
-
-import java.io.IOException;
 
 /**
  * Controlador de login para autenticar que el usuario que entra existe
@@ -59,7 +50,7 @@ public class ControladorLogin
         if (user.isEmpty() || pass.isEmpty())
         {
             shakeEffect(btnLogin);
-            mostrarAlerta("Campos vacíos", "Por favor, introduce usuario y contraseña.");
+            ControladorAlertas.mostrar("Campos vacíos", "Por favor, introduce usuario y contraseña.", btnLogin, true);
         }
         else
         {
@@ -68,52 +59,14 @@ public class ControladorLogin
             if (usuarioEncontrado != null)
             {
                 //Login correcto
-                Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/admin/VistaMenuInicialAdmin.fxml", "Menu Inicial");
+                Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/admin/VistaMenuInicialAdmin.fxml", "Menú Inicial");
             }
             else
             {
                 //Login incorrecto
                 shakeEffect(btnLogin);
-                mostrarAlerta("Error de autenticación", "El usuario o la contraseña no son correctos.");
+                ControladorAlertas.mostrar("Error de autenticación", "El usuario o la contraseña no son correctos.", btnLogin, true);
             }
-        }
-    }
-
-    /** Método auxiliar para mostrar alertas de error
-     * @param titulo
-     * @param mensaje
-     */
-    private void mostrarAlerta(String titulo, String mensaje)
-    {
-        try
-        {
-            Stage stagePrincipal = (Stage) btnLogin.getScene().getWindow();
-            Scene escenaPrincipal = btnLogin.getScene();
-
-            // Efecto de oscurecimiento al fondo
-            ColorAdjust adj = new ColorAdjust();
-            adj.setBrightness(-0.5);
-            escenaPrincipal.getRoot().setEffect(adj);
-
-            // Cargamos el FXML de la alerta
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/tpv_angela/vistas/VistaAlertas.fxml"));
-            Parent root = loader.load();
-
-            ControladorAlertas controlador = loader.getController();
-            controlador.configurarAlerta(titulo, mensaje);
-            Stage stageAlerta = new Stage();
-            stageAlerta.initModality(Modality.APPLICATION_MODAL);
-            stageAlerta.initOwner(stagePrincipal);
-            stageAlerta.initStyle(StageStyle.UNDECORATED);
-            Scene sceneAlerta = new Scene(root);
-            stageAlerta.setScene(sceneAlerta);
-            stageAlerta.showAndWait();
-
-            // Quitamos el efecto
-            escenaPrincipal.getRoot().setEffect(null);
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

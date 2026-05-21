@@ -7,9 +7,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import org.example.tpv_angela.Navegacion;
+import org.example.tpv_angela.controladores.TecladoTactil;
 
 import java.io.IOException;
 
+/**
+ * Controlador principal que coordina la navegación del área de camarero.
+ */
 public class ControladorGeneralCamarero {
 
     @FXML private AnchorPane contentArea;
@@ -17,17 +21,17 @@ public class ControladorGeneralCamarero {
 
     /**
      * Carga la vista inicial y marca automáticamente el botón correspondiente
+     * @param fxmlInterno ruta FXML interna que se debe cargar.
      */
     public void setVistaInicial(String fxmlInterno) {
         // 1. Cargamos el contenido en el centro
         cambiarContenidoCentral(fxmlInterno);
 
-        // 2. Marcamos el botón comparando la ruta del FXML recibido
         if (fxmlInterno.contains("VistaVentas")) {
             marcarBoton(btnVentas);
         } else if (fxmlInterno.contains("VistaMapaMesas")) {
             marcarBoton(btnMapa);
-        } else if (fxmlInterno.contains("VistaMenuCarta")) {
+        } else if (fxmlInterno.contains("VistaMenuCarta") || fxmlInterno.contains("VistaMenuPrincipal")) {
             marcarBoton(btnMenu);
         } else if (fxmlInterno.contains("VistaCaja")) {
             marcarBoton(btnArqueo);
@@ -36,41 +40,64 @@ public class ControladorGeneralCamarero {
         }
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     */
     @FXML
     private void clickVentas() {
-        cambiarContenidoCentral("/org/example/tpv_angela/vistas/VistaVentas.fxml");
+        cambiarContenidoCentral("/org/example/tpv_angela/vistas/camarero/VistaVentas.fxml");
         marcarBoton(btnVentas);
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     */
     @FXML
     private void clickMapa() {
         cambiarContenidoCentral("/org/example/tpv_angela/vistas/VistaMapaMesas.fxml");
         marcarBoton(btnMapa);
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     */
     @FXML
     private void clickMenu() {
         cambiarContenidoCentral("/org/example/tpv_angela/vistas/VistaMenuCarta.fxml");
         marcarBoton(btnMenu);
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     */
     @FXML
     private void clickArqueo() {
-        cambiarContenidoCentral("/org/example/tpv_angela/vistas/VistaCaja.fxml");
+        cambiarContenidoCentral("/org/example/tpv_angela/vistas/camarero/VistaCaja.fxml");
         marcarBoton(btnArqueo);
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     * @param event evento que dispara la acción.
+     */
     @FXML
     private void clickInicio(ActionEvent event) {
-        // Al volver al menú de botones grandes, cambiamos la escena completa
-        Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/camarero/VistaMenuInicialCamarero.fxml", "Menu Inicial Camarero");
+        Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/camarero/VistaMenuInicialCamarero.fxml", "Menú Inicial Camarero");
     }
 
+    /**
+     * Gestiona la acción de navegación asociada al botón pulsado.
+     * @param event evento que dispara la acción.
+     */
     @FXML
     private void clickSalir(ActionEvent event) {
         Navegacion.cambiarVista(event, "/org/example/tpv_angela/vistas/VistaPantallaInicio.fxml", "Inicio");
     }
 
+    /**
+     * Ejecuta la operación asociada a este controlador o servicio.
+     * @param bSeleccionado botón que debe quedar marcado como seleccionado.
+     */
     private void marcarBoton(Button bSeleccionado) {
         Button[] botones = {btnInicio, btnVentas, btnMapa, btnMenu, btnArqueo};
         for (Button b : botones) {
@@ -83,17 +110,39 @@ public class ControladorGeneralCamarero {
         }
     }
 
+    /**
+     * Ejecuta la operación asociada a este controlador o servicio.
+     * @param fxml ruta FXML que se va a cargar.
+     */
     private void cambiarContenidoCentral(String fxml) {
         try {
-            Parent view = FXMLLoader.load(getClass().getResource(fxml));
+            if (fxml.endsWith("VistaMenuPrincipal.fxml")) {
+                fxml = "/org/example/tpv_angela/vistas/VistaMenuCarta.fxml";
+            }
+            // Si la ruta no empieza por /, se la ponemos para que busque desde la raíz del classpath
+            if (!fxml.startsWith("/")) {
+                fxml = "/org/example/tpv_angela/vistas/camarero/" + fxml;
+            }
+
+            System.out.println("Intentando cargar: " + fxml);
+            var resource = getClass().getResource(fxml);
+
+            if (resource == null) {
+                throw new RuntimeException("No se encontro el FXML en la ruta: " + fxml);
+            }
+
+            Parent view = FXMLLoader.load(resource);
+            TecladoTactil.instalar(view);
             contentArea.getChildren().setAll(view);
 
+            // Ajustar al tamaño del AnchorPane
             AnchorPane.setTopAnchor(view, 0.0);
             AnchorPane.setBottomAnchor(view, 0.0);
             AnchorPane.setLeftAnchor(view, 0.0);
             AnchorPane.setRightAnchor(view, 0.0);
-        } catch (IOException e) {
-            System.err.println("Error al cargar el FXML: " + fxml);
+
+        } catch (Exception e) {
+            System.err.println("ERROR CRÍTICO: Fallo al cargar la subvista");
             e.printStackTrace();
         }
     }
