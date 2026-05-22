@@ -113,7 +113,7 @@ public class ControladorCajaCamarero {
         DAOArqueoCaja.ResumenDia resumen = daoArqueo.obtenerResumenHoy();
         lblDia.setText("Día: " + resumen.dia);
         lblTotalTarjeta.setText("Total tarjeta: " + moneda(resumen.ventasTarjeta));
-        lblTotalEfectivo.setText("Total efectivo: " + moneda(resumen.efectivoEnCaja()));
+        lblTotalEfectivo.setText("Total efectivo: " + moneda(resumen.ventasEfectivo));
         lblTotal.setText("Total: " + moneda(resumen.totalVentas));
         lblCuentasDia.setText("Cuentas de día " + resumen.dia);
         txtEfectivoDeclarado.setPromptText(String.format("%.2f", resumen.efectivoEnCaja()));

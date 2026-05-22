@@ -526,6 +526,24 @@
     -fx-text-fill: white;
 }
 
+.mesa-camarero.mesa-libre {
+    -fx-background-color: #8e44ad;
+    -fx-border-color: #6f2f8d;
+    -fx-text-fill: white;
+}
+
+.mesa-camarero.mesa-ocupada {
+    -fx-background-color: #27ae60;
+    -fx-border-color: #1f8e4f;
+    -fx-text-fill: white;
+}
+
+.mesa-camarero.mesa-precuenta {
+    -fx-background-color: #ff6fae;
+    -fx-border-color: #d94a8b;
+    -fx-text-fill: white;
+}
+
 .silla-mesa {
     -fx-min-width: 20;
     -fx-min-height: 20;

@@ -30,6 +30,7 @@ public class ControladorCajaAdmin {
     @FXML private Label lblInfo;
     @FXML private Label lblTotalTarjeta;
     @FXML private Label lblTotalEfectivo;
+    @FXML private Label lblEfectivoCaja;
     @FXML private Label lblTotal;
     @FXML private Label lblCuentasDia;
     @FXML private TextField txtImporteRetirada;
@@ -63,6 +64,11 @@ public class ControladorCajaAdmin {
                 mostrarDetalleCuentaDia(tablaCuentasDia.getSelectionModel().getSelectedItem());
             }
         });
+        tablaMovimientos.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 1) {
+                mostrarDetalleMovimiento(tablaMovimientos.getSelectionModel().getSelectedItem());
+            }
+        });
     }
 
     /**
@@ -76,8 +82,9 @@ public class ControladorCajaAdmin {
                 ControladorAlertas.mostrar("Dato incorrecto", "El importe debe ser mayor que cero.");
                 return;
             }
-            if (importe > daoArqueo.obtenerResumenHoy().efectivoEnCaja() + 0.01) {
-                ControladorAlertas.mostrar("Caja insuficiente", "No hay tanto efectivo disponible en la caja de hoy.");
+            double disponible = efectivoRetirableHoy();
+            if (importe > disponible + 0.01) {
+                ControladorAlertas.mostrar("Caja insuficiente", "La retirada debe dejar siempre 300.00 € en el cajon.");
                 return;
             }
 
@@ -92,6 +99,58 @@ public class ControladorCajaAdmin {
     }
 
     /**
+     * Retira el efectivo disponible del dia dejando el fondo fijo en caja.
+     */
+    @FXML
+    private void retirarEfectivoDia() {
+        double importe = efectivoRetirableHoy();
+        if (importe <= 0.01) {
+            ControladorAlertas.mostrar("Sin efectivo para retirar", "La caja ya conserva solo el fondo fijo de 300.00 €.");
+            return;
+        }
+
+        daoArqueo.registrarRetiradaAdmin(importe, "Retirada de efectivo del dia para sobre semanal de ingreso bancario");
+        txtImporteRetirada.clear();
+        txtMotivoRetirada.clear();
+        cargarDatos();
+        ControladorAlertas.mostrar("Retirada guardada", "Se han retirado " + moneda(importe) + " y quedan 300.00 € en el cajon.");
+    }
+
+    /**
+     * Calcula el efectivo que puede retirarse sin tocar el fondo fijo.
+     * @return importe retirable del dia.
+     */
+    @FXML
+    private void pagarProveedor() {
+        try {
+            double importe = parseImporte(txtImporteRetirada.getText());
+            if (importe <= 0) {
+                ControladorAlertas.mostrar("Dato incorrecto", "El importe debe ser mayor que cero.");
+                return;
+            }
+
+            DAOArqueoCaja.ResumenDia resumen = daoArqueo.obtenerResumenHoy();
+            if (importe > resumen.efectivoEnCaja() + 0.01) {
+                ControladorAlertas.mostrar("Caja insuficiente", "No hay tanto efectivo disponible en el cajon.");
+                return;
+            }
+
+            daoArqueo.registrarPagoProveedorAdmin(importe, txtMotivoRetirada.getText());
+            txtImporteRetirada.clear();
+            txtMotivoRetirada.clear();
+            cargarDatos();
+            ControladorAlertas.mostrar("Pago guardado", "El pago al proveedor se ha descontado del efectivo del cajon.");
+        } catch (NumberFormatException e) {
+            ControladorAlertas.mostrar("Dato incorrecto", "Introduce un importe valido.");
+        }
+    }
+
+    private double efectivoRetirableHoy() {
+        DAOArqueoCaja.ResumenDia resumen = daoArqueo.obtenerResumenHoy();
+        return Math.max(0.0, resumen.efectivoEnCaja() - DAOArqueoCaja.FONDO_CAMBIO);
+    }
+
+    /**
      * Configura los controles y columnas necesarios para la vista.
      */
     private void configurarTablas() {
@@ -102,7 +161,7 @@ public class ControladorCajaAdmin {
 
         colFechaMovimiento.setCellValueFactory(data -> texto(formatearFecha(data.getValue().get("fecha"))));
         colImporteMovimiento.setCellValueFactory(data -> texto(moneda(data.getValue().get("importe"))));
-        colMotivoMovimiento.setCellValueFactory(data -> texto(String.valueOf(data.getValue().get("motivo", ""))));
+        colMotivoMovimiento.setCellValueFactory(data -> texto(textoMovimiento(data.getValue())));
 
         colCuentaFecha.setCellValueFactory(data -> texto(String.valueOf(data.getValue().get("nombre", ""))));
         colCuentaMesa.setCellValueFactory(data -> texto("Mesa " + valorTexto(data.getValue().get("mesa"))));
@@ -117,7 +176,8 @@ public class ControladorCajaAdmin {
         DAOArqueoCaja.ResumenDia resumen = daoArqueo.obtenerResumenHoy();
         lblInfo.setText("Caja del día " + resumen.dia);
         lblTotalTarjeta.setText("Total tarjeta: " + moneda(resumen.ventasTarjeta));
-        lblTotalEfectivo.setText("Total efectivo: " + moneda(resumen.efectivoEnCaja()));
+        lblTotalEfectivo.setText("Total efectivo: " + moneda(resumen.ventasEfectivo));
+        lblEfectivoCaja.setText(textoEfectivoCaja(resumen));
         lblTotal.setText("Total: " + moneda(resumen.totalVentas));
         lblCuentasDia.setText("Cuentas de día " + resumen.dia);
         tablaArqueos.setItems(FXCollections.observableArrayList(daoArqueo.listarArqueos()));
@@ -132,6 +192,23 @@ public class ControladorCajaAdmin {
      */
     private SimpleStringProperty texto(String valor) {
         return new SimpleStringProperty(valor);
+    }
+
+    private String textoEfectivoCaja(DAOArqueoCaja.ResumenDia resumen) {
+        double faltante = DAOArqueoCaja.FONDO_CAMBIO - resumen.efectivoEnCaja();
+        if (faltante > 0.01) {
+            return "Efectivo caja: " + moneda(resumen.efectivoEnCaja()) + " | faltan " + moneda(faltante);
+        }
+        return "Efectivo caja: " + moneda(resumen.efectivoEnCaja());
+    }
+
+    private String textoMovimiento(Document movimiento) {
+        String tipo = String.valueOf(movimiento.get("tipo", ""));
+        String motivo = String.valueOf(movimiento.get("motivo", ""));
+        if (tipo.isBlank()) {
+            return motivo;
+        }
+        return tipo + " | " + motivo;
     }
 
     /**
@@ -230,6 +307,26 @@ public class ControladorCajaAdmin {
     }
 
     /**
+     * Muestra los datos completos de un movimiento de caja.
+     * @param movimiento movimiento seleccionado.
+     */
+    private void mostrarDetalleMovimiento(Document movimiento) {
+        if (movimiento == null) {
+            return;
+        }
+
+        String motivo = String.valueOf(movimiento.get("motivo", ""));
+        StringBuilder detalle = new StringBuilder();
+        detalle.append("Dia: ").append(String.valueOf(movimiento.get("dia", ""))).append("\n");
+        detalle.append("Tipo: ").append(String.valueOf(movimiento.get("tipo", ""))).append("\n");
+        detalle.append("Importe: ").append(moneda(movimiento.get("importe"))).append("\n");
+        detalle.append("Rol: ").append(String.valueOf(movimiento.get("rol", ""))).append("\n");
+        detalle.append("Motivo: ").append(motivo.isBlank() ? "Sin motivo indicado" : motivo).append("\n");
+
+        mostrarMiniVentanaTicket("Movimiento de caja", detalle.toString(), tablaMovimientos);
+    }
+
+    /**
      * Devuelve una representación de texto segura para el valor recibido.
      * @param valor valor que se procesa.
      * @return texto formateado o normalizado.
@@ -244,7 +341,17 @@ public class ControladorCajaAdmin {
      * @param mensaje mensaje que se muestra al usuario.
      */
     private void mostrarMiniVentanaTicket(String titulo, String mensaje) {
-        if (tablaCuentasDia.getScene() == null || tablaCuentasDia.getScene().getWindow() == null) {
+        mostrarMiniVentanaTicket(titulo, mensaje, tablaCuentasDia);
+    }
+
+    /**
+     * Muestra en pantalla la informaciÃ³n indicada.
+     * @param titulo tÃ­tulo que se muestra al usuario.
+     * @param mensaje mensaje que se muestra al usuario.
+     * @param origen tabla desde la que se abre la ventana.
+     */
+    private void mostrarMiniVentanaTicket(String titulo, String mensaje, TableView<Document> origen) {
+        if (origen.getScene() == null || origen.getScene().getWindow() == null) {
             ControladorAlertas.mostrar(titulo, mensaje);
             return;
         }
@@ -278,7 +385,7 @@ public class ControladorCajaAdmin {
         contenido.getStylesheets().add(getClass().getResource("/org/example/tpv_angela/estilo/style.css").toExternalForm());
 
         popup.getContent().add(contenido);
-        Window ventana = tablaCuentasDia.getScene().getWindow();
+        Window ventana = origen.getScene().getWindow();
         popup.show(ventana);
         popup.setX(ventana.getX() + (ventana.getWidth() - 560) / 2);
         popup.setY(ventana.getY() + 150);

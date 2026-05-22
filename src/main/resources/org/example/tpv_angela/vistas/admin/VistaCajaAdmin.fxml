@@ -23,7 +23,7 @@
         </HBox>
 
         <HBox spacing="18" VBox.vgrow="ALWAYS">
-            <VBox spacing="10" styleClass="ticket-container" HBox.hgrow="ALWAYS">
+            <VBox maxWidth="Infinity" spacing="10" styleClass="ticket-container" HBox.hgrow="ALWAYS">
                 <Label fx:id="lblCuentasDia" styleClass="caja-section-label" text="Cuentas de dia" />
                 <TableView fx:id="tablaCuentasDia" prefHeight="230">
                     <columns>
@@ -44,17 +44,20 @@
                 </TableView>
             </VBox>
 
-            <VBox prefWidth="430" spacing="12" styleClass="ticket-container">
+            <VBox maxWidth="Infinity" spacing="12" styleClass="ticket-container" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblEfectivoCaja" styleClass="caja-total-efectivo" text="Efectivo caja: 0.00 â‚¬" />
                 <Label styleClass="caja-section-label" text="Sacar dinero de caja" />
                 <TextField fx:id="txtImporteRetirada" promptText="Importe retirado" styleClass="input-field" />
                 <TextField fx:id="txtMotivoRetirada" promptText="Motivo" styleClass="input-field" />
                 <Button maxWidth="Infinity" onAction="#registrarRetirada" prefHeight="56" styleClass="caja-action-danger" text="REGISTRAR RETIRADA" />
+                <Button maxWidth="Infinity" onAction="#pagarProveedor" prefHeight="56" styleClass="caja-action-danger" text="PAGO PROVEEDOR" />
+                <Button maxWidth="Infinity" onAction="#retirarEfectivoDia" prefHeight="56" styleClass="caja-action-success" text="RETIRADA EFECTIVO DEL DIA" />
                 <Label styleClass="caja-section-label" text="Movimientos de caja" />
                 <TableView fx:id="tablaMovimientos" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colFechaMovimiento" prefWidth="145" text="Fecha" />
+                        <TableColumn fx:id="colFechaMovimiento" prefWidth="185" text="Fecha" />
                         <TableColumn fx:id="colImporteMovimiento" prefWidth="95" text="Importe" />
-                        <TableColumn fx:id="colMotivoMovimiento" prefWidth="160" text="Motivo" />
+                        <TableColumn fx:id="colMotivoMovimiento" prefWidth="280" text="Motivo" />
                     </columns>
                 </TableView>
             </VBox>

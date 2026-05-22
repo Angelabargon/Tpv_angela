@@ -52,25 +52,25 @@ public class ControladorGestionCarta {
      * Gestiona la selección de la imagen local del plato.
      */
     @FXML
-    private void seleccionarImagenLocal() {
+    private void seleccionarImagenLocal()
+    {
         FileChooser selector = new FileChooser();
         selector.setTitle("Seleccionar imagen del plato");
-        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-                "Imagenes", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp"
-        ));
+        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter
+                ("Imagenes", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp"));
 
         File archivo = selector.showOpenDialog(btnSeleccionarImagen.getScene().getWindow());
-        if (archivo == null) {
-            return;
-        }
+        if (archivo == null)
+        {return;}
 
-        try {
+        try
+        {
             String rutaCopiada = copiarImagenLocal(archivo);
             imagenFormulario = rutaCopiada;
             lblEstado.setText("Imagen seleccionada: " + archivo.getName());
-        } catch (IOException e) {
-            lblEstado.setText("No se pudo copiar la imagen seleccionada.");
         }
+        catch (IOException e)
+        {lblEstado.setText("No se pudo copiar la imagen seleccionada.");}
     }
 
     /**

@@ -349,6 +349,13 @@ public class DAOMenu {
      * @param numero número identificador.
      * @param capacidad capacidad de comensales de la mesa.
      */
+    public void eliminarItemListaCompra(Document item) {
+        Object id = item == null ? null : item.get("_id");
+        if (id != null) {
+            getColeccionListaCompra().deleteOne(Filters.eq("_id", id));
+        }
+    }
+
     public void agregarMesa(int numero, int capacidad) {
         Document mesa = new Document("numero", numero)
                 .append("capacidad", capacidad)

@@ -19,6 +19,8 @@ import java.util.Map;
  * DAO responsable de guardar y consultar arqueos y movimientos de caja.
  */
 public class DAOArqueoCaja {
+    public static final double FONDO_CAMBIO = 300.0;
+
     private final MongoCollection<Document> coleccionVentas;
     private final MongoCollection<Document> coleccionArqueos;
     private final MongoCollection<Document> coleccionMovimientosCaja;
@@ -42,6 +44,7 @@ public class DAOArqueoCaja {
         Date inicio = inicioDia(new Date());
         Date fin = finDia(new Date());
         ResumenDia resumen = obtenerResumenVentas(inicio, fin);
+        resumen.fondoCambio = obtenerFondoCambioInicioDia(inicio);
         resumen.retiradoEfectivo = obtenerRetiradoEfectivo(inicio, fin);
         return resumen;
     }
@@ -65,6 +68,7 @@ public class DAOArqueoCaja {
                 .append("ventasTotales", resumen.totalVentas)
                 .append("ventasEfectivo", resumen.ventasEfectivo)
                 .append("ventasTarjeta", resumen.ventasTarjeta)
+                .append("fondoCambio", resumen.fondoCambio)
                 .append("retiradoEfectivo", resumen.retiradoEfectivo)
                 .append("efectivoEsperado", resumen.efectivoEnCaja())
                 .append("efectivoDeclarado", efectivoDeclarado)
@@ -121,6 +125,7 @@ public class DAOArqueoCaja {
                 .append("ventasTotales", resumen.totalVentas)
                 .append("ventasEfectivo", resumen.ventasEfectivo)
                 .append("ventasTarjeta", resumen.ventasTarjeta)
+                .append("fondoCambio", resumen.fondoCambio)
                 .append("retiradoEfectivo", resumen.retiradoEfectivo)
                 .append("efectivoEsperado", resumen.efectivoEnCaja())
                 .append("numeroVentas", resumen.numeroVentas)
@@ -142,6 +147,23 @@ public class DAOArqueoCaja {
                 .append("rol", "ADMIN")
                 .append("importe", importe)
                 .append("motivo", motivo == null ? "" : motivo.trim());
+        coleccionMovimientosCaja.insertOne(movimiento);
+        return movimiento;
+    }
+
+    /**
+     * Registra un pago a proveedor realizado con efectivo del cajon.
+     * @param importe importe pagado al proveedor.
+     * @param motivo proveedor o motivo del pago.
+     * @return documento con la informacion solicitada.
+     */
+    public Document registrarPagoProveedorAdmin(double importe, String motivo) {
+        Document movimiento = new Document("fecha", new Date())
+                .append("dia", formatoDia.format(new Date()))
+                .append("tipo", "PAGO_PROVEEDOR")
+                .append("rol", "ADMIN")
+                .append("importe", importe)
+                .append("motivo", motivo == null ? "Pago a proveedor" : motivo.trim());
         coleccionMovimientosCaja.insertOne(movimiento);
         return movimiento;
     }
@@ -370,13 +392,38 @@ public class DAOArqueoCaja {
     private double obtenerRetiradoEfectivo(Date inicio, Date fin) {
         double total = 0.0;
         for (Document movimiento : coleccionMovimientosCaja.find(Filters.and(
-                Filters.eq("tipo", "RETIRADA"),
+                Filters.in("tipo", "RETIRADA", "PAGO_PROVEEDOR"),
                 Filters.gte("fecha", inicio),
                 Filters.lte("fecha", fin)
         ))) {
             total += numero(movimiento.get("importe"));
         }
         return total;
+    }
+
+    /**
+     * Calcula el fondo real con el que empieza el dia, arrastrando faltantes anteriores.
+     * @param inicio inicio del dia que se esta calculando.
+     * @return fondo de cambio disponible al iniciar el dia.
+     */
+    private double obtenerFondoCambioInicioDia(Date inicio) {
+        double efectivoAnterior = 0.0;
+        for (Document venta : coleccionVentas.find(Filters.lt("fecha", inicio))) {
+            if (metodoCobro(venta).equals("EFECTIVO")) {
+                efectivoAnterior += numero(venta.get("total"));
+            }
+        }
+
+        double retiradoAnterior = 0.0;
+        for (Document movimiento : coleccionMovimientosCaja.find(Filters.and(
+                Filters.in("tipo", "RETIRADA", "PAGO_PROVEEDOR"),
+                Filters.lt("fecha", inicio)
+        ))) {
+            retiradoAnterior += numero(movimiento.get("importe"));
+        }
+
+        double fondoCalculado = FONDO_CAMBIO + efectivoAnterior - retiradoAnterior;
+        return Math.max(0.0, Math.min(FONDO_CAMBIO, fondoCalculado));
     }
 
     /**
@@ -449,6 +496,7 @@ public class DAOArqueoCaja {
          * Efectivo retirado de caja.
          */
         public double retiradoEfectivo;
+        public double fondoCambio = FONDO_CAMBIO;
         /**
          * Número de ventas registradas.
          */
@@ -459,7 +507,7 @@ public class DAOArqueoCaja {
          * @return valor numérico calculado.
          */
         public double efectivoEnCaja() {
-            return ventasEfectivo - retiradoEfectivo;
+            return fondoCambio + ventasEfectivo - retiradoEfectivo;
         }
     }
 }

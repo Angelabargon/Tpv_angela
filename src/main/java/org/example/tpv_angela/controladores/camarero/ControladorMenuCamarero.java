@@ -25,9 +25,6 @@ public class ControladorMenuCamarero {
 
     public void mapaMesas(ActionEvent event)
     {
-        if (ventasBloqueadas()) {
-            return;
-        }
         navegarAContenedor(event, "/org/example/tpv_angela/vistas/VistaMapaMesas.fxml");
     }
 

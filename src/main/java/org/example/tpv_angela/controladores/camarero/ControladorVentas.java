@@ -366,27 +366,25 @@ public class ControladorVentas {
      */
     private void ejecutarCobro(String metodo) {
         try {
-            if (ventasDAO.cajaCerradaHoy()) {
-                bloquearVentaPorCajaCerrada();
-                return;
-            }
+            if (ventasDAO.cajaCerradaHoy())
+            {bloquearVentaPorCajaCerrada();
+                return;}
+
             double montoEntregado = buffer.isEmpty() ? totalAcumulado : Double.parseDouble(buffer.replace(",", "."));
             double cambio = Math.max(0.0, montoEntregado - totalAcumulado);
             double montoAPagarAhora = Math.min(montoEntregado, totalAcumulado);
 
             // Acumulamos el pago según el método
-            if (metodo.equals("EFECTIVO")) {
+            if (metodo.equals("EFECTIVO"))
+            {
                 pagadoEfectivoAcumulado += montoAPagarAhora;
                 efectivoRecibidoAcumulado += montoEntregado;
                 cambioDevueltoAcumulado += cambio;
-            } else {
-                pagadoTarjetaAcumulado += montoAPagarAhora;
             }
+            else {pagadoTarjetaAcumulado += montoAPagarAhora;}
 
             int numMesa = Integer.parseInt(lblMesaActiva.getText().replace("MESA: ", ""));
-            if (ticketActualId == null || ticketActualId.isBlank()) {
-                ticketActualId = "mesa-" + numMesa + "-" + System.currentTimeMillis();
-            }
+            if (ticketActualId == null || ticketActualId.isBlank()) {ticketActualId = "mesa-" + numMesa + "-" + System.currentTimeMillis();}
             ventasDAO.registrarVenta(numMesa, new ArrayList<>(listaTicket.getItems()), montoAPagarAhora, metodo, ticketActualId);
 
             totalAcumulado -= montoAPagarAhora;
@@ -404,30 +402,34 @@ public class ControladorVentas {
                 ticketActualId = null;
                 mesaCerrada = false;
                 acordeonMenu.setDisable(false);
-                if (metodo.equals("EFECTIVO")) {
+                if (metodo.equals("EFECTIVO"))
+                {
                     ControladorAlertas.mostrar(
                             "FINALIZADO",
                             "Cobrado en efectivo: " + String.format("%.2f \u20AC", montoEntregado)
                                     + "\nA devolver: " + String.format("%.2f \u20AC", cambio)
                     );
-                } else {
-                    ControladorAlertas.mostrar("FINALIZADO", "Mesa cobrada integramente. Recibo en /recibos.");
                 }
-            } else {
-                if (metodo.equals("EFECTIVO")) {
+                else {ControladorAlertas.mostrar("FINALIZADO", "Mesa cobrada integramente. Recibo en /recibos.");}
+            }
+            else
+            {
+                if (metodo.equals("EFECTIVO"))
+                {
                     ControladorAlertas.mostrar(
                             "PAGO PARCIAL",
                             "Cobrado en efectivo: " + String.format("%.2f \u20AC", montoEntregado)
                                     + "\nDevuelto: " + String.format("%.2f \u20AC", cambio)
                                     + "\nFaltan: " + String.format("%.2f \u20AC", totalAcumulado)
                     );
-                } else {
-                    ControladorAlertas.mostrar("PAGO PARCIAL", "Cobro anotado. Faltan: " + String.format("%.2f", totalAcumulado) + " \u20AC");
                 }
+                else
+                {ControladorAlertas.mostrar("PAGO PARCIAL", "Cobro anotado. Faltan: " +
+                        String.format("%.2f", totalAcumulado) + " \u20AC");}
             }
-        } catch (IllegalStateException e) {
-            bloquearVentaPorCajaCerrada();
-        } catch (Exception e) { e.printStackTrace(); }
+        }
+        catch (IllegalStateException e) {bloquearVentaPorCajaCerrada();}
+        catch (Exception e) { e.printStackTrace(); }
     }
 
     /**
@@ -485,7 +487,8 @@ public class ControladorVentas {
 
             PdfPTable tabla = new PdfPTable(2);
             tabla.setWidthPercentage(100);
-            tabla.setWidths(new float[]{4f, 1.2f}); // 80% para el nombre, 20% para el precio
+            tabla.setWidths(new float[]{4f, 1.2f});
+            // 80% para el nombre, 20% para el precio
             tabla.setSpacingBefore(5f);
 
             PdfPCell h1 = new PdfPCell(new Paragraph("ITEM", fBold));
@@ -530,9 +533,8 @@ public class ControladorVentas {
 
             agregarFilaTotal(tablaTotales, "Subtotal (10%):", String.format("%.2f \u20AC", base), fNormal);
             agregarFilaTotal(tablaTotales, "IVA:", String.format("%.2f \u20AC", iva), fNormal);
-            if (numMesa == 98 || numMesa == 99) {
-                agregarFilaTotal(tablaTotales, "DESCUENTO CAMARERO:", "20%", fNormal);
-            }
+            if (numMesa == 98 || numMesa == 99)
+            {agregarFilaTotal(tablaTotales, "DESCUENTO CAMARERO:", "20%", fNormal);}
             if(tipo.equals("recibo"))
             {agregarFilaTotal(tablaTotales, "TOTAL PAGADO:", String.format("%.2f \u20AC", totalInicialMesa), fBold);}
             else
@@ -543,16 +545,15 @@ public class ControladorVentas {
 
             double efectivoMostrado = efectivoRecibidoAcumulado > 0 ? efectivoRecibidoAcumulado : pagadoEfectivoAcumulado;
             doc.add(new Paragraph("COBRADO EN EFECTIVO: " + String.format("%.2f", efectivoMostrado) + " \u20AC", fSmall));
-            if (efectivoRecibidoAcumulado > 0) {
-                doc.add(new Paragraph("DEVUELTO: " + String.format("%.2f", cambioDevueltoAcumulado) + " \u20AC", fSmall));
-            }
+            if (efectivoRecibidoAcumulado > 0)
+            {doc.add(new Paragraph("DEVUELTO: " + String.format("%.2f", cambioDevueltoAcumulado) + " \u20AC", fSmall));}
             doc.add(new Paragraph("COBRADO EN TARJETA: " + String.format("%.2f", pagadoTarjetaAcumulado) + " \u20AC", fSmall));
 
             doc.add(new Paragraph("\n"));
             Paragraph g = new Paragraph("Gracias por su visita!", fBold);
             g.setAlignment(Element.ALIGN_CENTER);
-            doc.add(g);
 
+            doc.add(g);
             doc.close();
         }
         catch (Exception e)

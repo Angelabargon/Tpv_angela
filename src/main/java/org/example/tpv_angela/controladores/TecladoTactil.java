@@ -348,6 +348,7 @@ public final class TecladoTactil {
      */
     private static Button crearTecla(String texto, Runnable accion, double ancho) {
         Button boton = new Button(texto);
+        boton.setFocusTraversable(false);
         boton.setMinSize(ancho, 54);
         boton.setPrefSize(ancho, 54);
         boton.getStyleClass().add("teclado-tecla");

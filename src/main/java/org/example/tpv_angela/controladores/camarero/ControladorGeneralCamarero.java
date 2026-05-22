@@ -27,7 +27,7 @@ public class ControladorGeneralCamarero {
      * @param fxmlInterno ruta FXML interna que se debe cargar.
      */
     public void setVistaInicial(String fxmlInterno) {
-        if ((fxmlInterno.contains("VistaVentas") || fxmlInterno.contains("VistaMapaMesas")) && ventasBloqueadas()) {
+        if (fxmlInterno.contains("VistaVentas") && ventasBloqueadas()) {
             fxmlInterno = "/org/example/tpv_angela/vistas/camarero/VistaCaja.fxml";
         }
         // 1. Cargamos el contenido en el centro
@@ -63,9 +63,6 @@ public class ControladorGeneralCamarero {
      */
     @FXML
     private void clickMapa() {
-        if (ventasBloqueadas()) {
-            return;
-        }
         cambiarContenidoCentral("/org/example/tpv_angela/vistas/VistaMapaMesas.fxml");
         marcarBoton(btnMapa);
     }

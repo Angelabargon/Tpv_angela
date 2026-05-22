@@ -1,12 +1,18 @@
 package org.example.tpv_angela.controladores.cocinero;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import org.bson.Document;
 import org.example.tpv_angela.DAO.DAOMenu;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,12 +27,14 @@ public class ControladorListaCompra {
     @FXML private Label lblEstado;
 
     private final DAOMenu daoMenu = new DAOMenu();
+    private final List<Document> itemsBorrador = new ArrayList<>();
 
     /**
      * Inicializa la vista, configura sus controles y carga los datos necesarios.
      */
     @FXML
     public void initialize() {
+        configurarListaBorrador();
         refrescar();
     }
 
@@ -63,10 +71,59 @@ public class ControladorListaCompra {
      */
     @FXML
     private void refrescar() {
-        listaBorrador.getItems().setAll(formatear(daoMenu.obtenerListaCompra("borrador")));
+        itemsBorrador.clear();
+        itemsBorrador.addAll(daoMenu.obtenerListaCompra("borrador"));
+        listaBorrador.getItems().setAll(formatear(itemsBorrador));
         listaEnviada.getItems().setAll(formatear(daoMenu.obtenerListaCompra("enviado")));
         listaComprada.getItems().setAll(formatearComprados(daoMenu.obtenerListaCompra("comprado")));
         lblEstado.setText("Lista de compra sincronizada.");
+    }
+
+    /**
+     * Configura las filas del borrador con accion de eliminar.
+     */
+    private void configurarListaBorrador() {
+        listaBorrador.setCellFactory(listView -> new ListCell<>() {
+            private final Label texto = new Label();
+            private final Button btnEliminar = new Button("Eliminar");
+            private final Region espacio = new Region();
+            private final HBox fila = new HBox(10, texto, espacio, btnEliminar);
+
+            {
+                texto.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(espacio, Priority.ALWAYS);
+                btnEliminar.getStyleClass().add("ticket-delete-button");
+                btnEliminar.setFocusTraversable(false);
+                btnEliminar.setOnAction(event -> eliminarBorrador(getIndex()));
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+                texto.setText(item);
+                setText(null);
+                setGraphic(fila);
+            }
+        });
+    }
+
+    /**
+     * Elimina una linea del borrador.
+     * @param indice posicion visual seleccionada.
+     */
+    private void eliminarBorrador(int indice) {
+        if (indice < 0 || indice >= itemsBorrador.size()) {
+            lblEstado.setText("Selecciona una linea del borrador.");
+            return;
+        }
+        daoMenu.eliminarItemListaCompra(itemsBorrador.get(indice));
+        refrescar();
+        lblEstado.setText("Linea eliminada del borrador.");
     }
 
     /**
